@@ -3,12 +3,9 @@ package com.example.thenu.androidriderapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +23,12 @@ import android.widget.Toast;
 
 import com.example.thenu.androidriderapp.Common.Common;
 import com.example.thenu.androidriderapp.Helper.CustomInfoWindow;
+import com.example.thenu.androidriderapp.Model.FCMResponse;
+import com.example.thenu.androidriderapp.Model.Notification;
 import com.example.thenu.androidriderapp.Model.Rider;
+import com.example.thenu.androidriderapp.Model.Sender;
+import com.example.thenu.androidriderapp.Model.Token;
+import com.example.thenu.androidriderapp.Remote.IFCMService;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
@@ -50,6 +52,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback ,
@@ -80,6 +88,7 @@ SupportMapFragment mapFragment;
     int radius = 1;
     int distance = 1;
     private static final int LIMIT = 3;
+    IFCMService mService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +96,7 @@ SupportMapFragment mapFragment;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        mService = Common.getFCMService();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -115,11 +124,63 @@ SupportMapFragment mapFragment;
         btnPickupRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                requestPickupHere(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                if(!isDriverFound)
+                   requestPickupHere(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                else
+                    sendRequestToDriver(driverId);
+
             }
         });
         setUpLocation();
+        updateirebaseToken();
 
+    }
+
+    private void updateirebaseToken() {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference tokens = db.getReference(Common.token_tb1);
+
+        Token token = new Token(FirebaseInstanceId.getInstance().getToken());
+        tokens.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .setValue(token);
+    }
+
+    private void sendRequestToDriver(String driverId) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Common.token_tb1);
+        tokens.orderByKey().equalTo(driverId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot postSnapshot:dataSnapshot.getChildren())
+                        {
+                            Token token = postSnapshot.getValue(Token.class);
+                            String json_lat_lng = new Gson().toJson(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
+                            Notification data = new Notification("NAMMATAXI",json_lat_lng);
+                            Sender content = new Sender(token.getToken(),data);
+                            mService.sendMessage(content)
+                                    .enqueue(new Callback<FCMResponse>() {
+                                        @Override
+                                        public void onResponse(Call<FCMResponse> call, Response<FCMResponse> response) {
+                                            if(response.body().success == 1)
+                                                Toast.makeText(Home.this,"Request sent!",Toast.LENGTH_SHORT).show();
+                                            else
+                                                Toast.makeText(Home.this,"Failed !",Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<FCMResponse> call, Throwable t) {
+                                            Log.e("ERROR",t.getMessage());
+
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void requestPickupHere(String uid) {
