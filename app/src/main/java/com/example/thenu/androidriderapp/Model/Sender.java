@@ -6,12 +6,12 @@ public class Sender {
     public String to;
     public Notification notification;
 
+    public Sender() {
+    }
+
     public Sender(String to, Notification notification) {
         this.to = to;
         this.notification = notification;
-    }
-
-    public Sender(String token, com.example.thenu.androidriderapp.Model.Notification data) {
     }
 
     public String getTo() {
@@ -30,4 +30,3 @@ public class Sender {
         this.notification = notification;
     }
 }
-

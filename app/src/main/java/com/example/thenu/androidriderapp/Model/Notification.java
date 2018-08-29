@@ -1,6 +1,6 @@
 package com.example.thenu.androidriderapp.Model;
 
-public class Notification {
+public class Notification extends android.app.Notification {
     public String title;
     public String body;
 

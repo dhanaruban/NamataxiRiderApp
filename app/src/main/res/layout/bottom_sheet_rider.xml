@@ -1,30 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<LinearLayout
+    android:orientation="vertical"
+    android:padding="16dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:cardElevation="10dp">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
     <LinearLayout
         android:orientation="vertical"
         android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_action_name"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
     <TextView
-        android:layout_marginTop="10dp"
-        android:text="As per the guidelines, one driver or vehicle can be attached to more than one operator and log-on/log-off discretion will be with the driver. However, each vehicle must have inter-operable tracking system such as GPS."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:layout_marginTop="10dp"
-        android:text="As per the guidelines, one driver or vehicle can be attached to more than one operator and log-on/log-off discretion will be with the driver. However, each vehicle must have inter-operable tracking system such as GPS."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:layout_marginTop="10dp"
-        android:text="As per the guidelines, one driver or vehicle can be attached to more than one operator and log-on/log-off discretion will be with the driver. However, each vehicle must have inter-operable tracking system such as GPS."
-        android:layout_width="wrap_content"
+        android:id="@+id/txtLocation"
+        android:text="Location"
+        android:layout_weight="9"
+        android:layout_width="0dp"
         android:layout_height="wrap_content" />
     </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</android.support.v7.widget.CardView>
+        <ImageView
+            android:src="@drawable/ic_map_black_24dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/txtDestination"
+        android:text="Destination"
+        android:layout_weight="9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/ic_attach_money_black_24dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/txtCalculator"
+        android:layout_weight="9"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content" />
+    </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

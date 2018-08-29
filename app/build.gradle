@@ -23,6 +23,7 @@ configurations.all {
 }
 
 dependencies {
+    implementation 'com.google.maps.android:android-maps-utils:0.5+'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:26.0.0-beta1'
