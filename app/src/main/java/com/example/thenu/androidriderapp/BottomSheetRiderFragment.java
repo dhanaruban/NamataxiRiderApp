@@ -69,14 +69,15 @@ public class BottomSheetRiderFragment extends BottomSheetDialogFragment {
             requestUrl = "https://maps.googleapis.com/maps/api/directions/json?"+
                     "mode=driving&"+"transit_routing_preference=less_driving&"
                     +"origin="+mLocation+"&"
-                    +"destination"+mDestination+"&"
-                    +"key"+getResources().getString(R.string.google_browser_key);
+                    +"destination="+mDestination+"&"
+                    +"key="+getResources().getString(R.string.google_browser_key);
             Log.e("LINK",requestUrl);
             mService.getPath(requestUrl).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
                     try {
                         JSONObject jsonObject = new JSONObject(response.body().toString());
+                        Log.e("ERROR",jsonObject.toString());
                         JSONArray routes = jsonObject.getJSONArray("routes");
 
                         JSONObject object = routes.getJSONObject(0);
@@ -92,6 +93,7 @@ public class BottomSheetRiderFragment extends BottomSheetDialogFragment {
                         String time_text = time.getString("text");
                         Integer time_value = Integer.parseInt(time_text.replaceAll("\\D+",""));
                         String final_calculate = String.format("%s + %s = $%.2f",distance_text,time_text,Common.getPrice(distance_value,time_value));
+                        Log.e("ERROR",final_calculate);
                         txtCalculator.setText(final_calculate);
                         if(isTapOnMap)
                         {

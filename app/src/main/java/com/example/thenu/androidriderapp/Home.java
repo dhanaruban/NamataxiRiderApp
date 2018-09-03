@@ -2,6 +2,7 @@ package com.example.thenu.androidriderapp;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,6 +52,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -152,7 +154,7 @@ SupportMapFragment mapFragment;
                 mPlaceLocation = place.getAddress().toString();
                 mMap.clear();
                 mUserMarker = mMap.addMarker(new MarkerOptions().position(place.getLatLng())
-                                                        .icon(BitmapDescriptorFactory.defaultMarker())
+                                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
                 .title("Pickup Here"));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15.0f));
             }
@@ -167,8 +169,11 @@ SupportMapFragment mapFragment;
             @Override
             public void onPlaceSelected(Place place) {
                 mPlaceDestination = place.getAddress().toString();
-              mMap.addMarker(new MarkerOptions().position(place.getLatLng())
-              .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+              mMap.addMarker(new MarkerOptions()
+                      .position(place.getLatLng())
+                      .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_marker))
+                       .title("Destination"));
+
               mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(),15.0f));
 
               BottomSheetRiderFragment mBottomSheet=BottomSheetRiderFragment.newInstance(mPlaceLocation,mPlaceDestination,false);
@@ -376,15 +381,7 @@ SupportMapFragment mapFragment;
                 final double latitude = mLastLocation.getLatitude();
                 final double longitude = mLastLocation.getLongitude();
 
-                        if (mUserMarker != null)
-                            mUserMarker.remove();
-                        mUserMarker = mMap.addMarker(new MarkerOptions()
 
-                                .position(new LatLng(latitude, longitude))
-                                .title(String.format("You")));
-
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15.0f));
-//                            rotateMarker(mCurrent, -360, mMap);
              loadAllAvailableDriver(new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude()));
 
             Log.d("Error", String.format("Your location was changed : if/if",latitude,longitude));
@@ -399,8 +396,13 @@ SupportMapFragment mapFragment;
     private void loadAllAvailableDriver(final LatLng location) {
 
         mMap.clear();
-        mMap.addMarker(new MarkerOptions().position(location)
-                                              .title("YOU"));
+        mUserMarker = mMap.addMarker(new MarkerOptions()
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                .position(location)
+                .title(String.format("You")));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 15.0f));
+//                            rotateMarker(mCurrent, -360, mMap);
 
         DatabaseReference driverLocation = FirebaseDatabase.getInstance().getReference(Common.driver_tb1);
         GeoFire gf = new GeoFire(driverLocation);
@@ -548,6 +550,20 @@ SupportMapFragment mapFragment;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        try{
+            boolean isSuccess = googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(this,R.raw.map_style)
+            );
+            if(!isSuccess)
+                Log.e("ERROR","Map style load failed !!!");
+        }
+        catch (Resources.NotFoundException ex)
+        {
+            ex.printStackTrace();
+        }
+
+
        mMap = googleMap;
        mMap.getUiSettings().setZoomControlsEnabled(true);
        mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -557,7 +573,9 @@ SupportMapFragment mapFragment;
            public void onMapClick(LatLng latLng) {
                if(markerDestination != null)
                    markerDestination.remove();
-               markerDestination = mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(latLng).title("Destination"));
+               markerDestination = mMap.addMarker(new MarkerOptions()
+                       .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_marker))
+                       .position(latLng).title("Destination"));
                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15.0f));
 
                BottomSheetRiderFragment mBottomSheet=BottomSheetRiderFragment.newInstance(String.format("%f,%f",mLastLocation.getLatitude(),mLastLocation.getLongitude()),String.format("%f,%f",latLng.latitude,latLng.longitude),false);

@@ -32,8 +32,8 @@
             android:layout_height="wrap_content" />
     </LinearLayout>
     <TextView
-        android:id="@+id/riderapp"
-        android:text="LOOKING FOR THE DRIVER APP?"
+        android:id="@+id/txt_forgot_pwd"
+        android:text="FORGOT PASSWORD ? JUST TAP HERE"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:layout_alignParentBottom="true"
@@ -46,7 +46,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_above="@+id/riderapp"
+        android:layout_above="@+id/txt_forgot_pwd"
         android:layout_margin="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
